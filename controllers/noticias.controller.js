@@ -261,25 +261,48 @@ const getReporte= async (req,res)=>{
   const medio = req.query.medio;
   const  fechaInicio = req.query.inicio;
   const fechaFin = req.query.fin;
- 
-  console.log(fechaInicio,fechaFin)
+   const tipo=req.query.tipo;
 
-med.findNoticiasFecha(fechaInicio,fechaFin,medio).then(resp=>{
-  if (resp.rows.length>0) {
-    res.json({
-      mesagge:'consulta correcta',
-      status:'200',
-      cantidad:resp.rowCount,
-      noticias:resp.rows,
+  console.log(fechaInicio,fechaFin)
+  console.log(tipo)
+  if (tipo===undefined) {
+    med.findNoticiasFecha(fechaInicio,fechaFin,medio).then(resp=>{
+      if (resp.rows.length>0) {
+        res.json({
+          mesagge:'consulta correcta',
+          status:'200',
+          cantidad:resp.rowCount,
+          noticias:resp.rows,
+        });
+      }else{
+        res.json({
+          mesagge:'no existen datos con el rango de fechas indicado',
+          status:'200',
+          resp
+        });
+      }
     });
   }else{
-    res.json({
-      mesagge:'no existen datos con el rango de fechas indicado',
-      status:'200',
-      resp
+    console.log('el eslse  perrp',tipo);
+
+    med.findNoticiasFecha(fechaInicio,fechaFin,medio,tipo).then(resp=>{
+      if (resp.rows.length>0) {
+        res.json({
+          mesagge:'consulta correcta',
+          status:'200',
+          cantidad:resp.rowCount,
+          noticias:resp.rows,
+        });
+      }else{
+        res.json({
+          mesagge:'no existen datos con el rango de fechas indicado',
+          status:'200',
+          resp
+        });
+      }
     });
   }
-});
+
 }
 
 // const getNoticias= async (req,res)=>{

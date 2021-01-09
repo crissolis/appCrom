@@ -161,8 +161,8 @@ return  not;
 /////////////////////////////////////
 const GuardarNoN= async (noticias) => {
   var tokenizer = new natural.AggressiveTokenizerEs;
-  // AFINN
-  var analyzer = new Analyzer("Spanish", stemmer, "senticon"); 
+  // AFINN  senticon
+  var analyzer = new Analyzer("Spanish", stemmer, "afinn"); 
 
   
   
@@ -206,7 +206,7 @@ const GuardarNoN= async (noticias) => {
     
     let l=  texto.search(regex);
     let txf =texto.slice(0,(l-2));
-	// console.log(txf)
+	  console.log(txf)
    txt= tokenizer.tokenize(txf);
     porcentaje=analyzer.getSentiment(txt);
     //  console.log(porcentaje);
@@ -280,7 +280,8 @@ const  findPrimerId= async (medio) =>{
   let id=medio ;
   let params=[id];
 
-  const response= await db.query(`SELECT * from noticia n WHERE n.medio_id=$1
+  const response= await db.query(`SELECT * from noticia n
+   WHERE n.medio_id=$1
    ORDER BY n.fecha_creacion ASC  limit 1`,params); 
   if (response.rowCount>0) {
     console.log(response.rows)
@@ -289,37 +290,72 @@ const  findPrimerId= async (medio) =>{
     return [];
   }
 }
-
-const  findNoticiasFecha= async (fechaInicio,fechaFin,medio) =>{
+ 
+const  findNoticiasFecha= async (fechaInicio,fechaFin,medio,tipo) =>{
   let params=[];
+  console.log(tipo);
   
   let i=new Date(fechaInicio);
   let f=new Date(fechaFin);
   console.log(medio)
-  if (medio!==undefined) {
-    params=[medio,fechaInicio,fechaFin];
-    const response= await db.query(`SELECT * from noticia n WHERE
-    n.medio_id=$1 AND
-    n.fecha_creacion  BETWEEN $2 AND $3
-    ORDER BY n.fecha_creacion ASC `,params); 
-   if (response.rowCount>0) {
-     console.log(response.rows)
-     return response;
-   }else{
-     return [];
-   }
-
+  if (tipo===undefined) {
+    if (medio!==undefined) {
+      params=[medio,fechaInicio,fechaFin];
+      const response= await db.query(`SELECT * from noticia n
+      LEFT JOIN  medio m ON m.medio_id=n.medio_id  WHERE n.activo=true AND 
+      n.medio_id=$1 AND
+      n.fecha_creacion  BETWEEN $2 AND $3
+      ORDER BY n.fecha_creacion ASC `,params); 
+     if (response.rowCount>0) {
+       console.log(response.rows)
+       return response;
+     }else{
+       return [];
+     }
+  
+    }else{
+      params=[i,f];
+      const response= await db.query(`SELECT * from noticia n 
+      LEFT JOIN  medio m ON m.medio_id=n.medio_id  WHERE n.activo=true AND 
+       n.fecha_creacion  BETWEEN  $1 AND $2
+      ORDER BY n.fecha_creacion ASC `,params);
+     if (response.rowCount>0) {
+      return response;
+     }else{
+       return [];
+     }
+    }
   }else{
-    params=[i,f];
-    const response= await db.query(`SELECT * from noticia n WHERE 
-     n.fecha_creacion  BETWEEN  $1 AND $2
-    ORDER BY n.fecha_creacion ASC `,params);
-   if (response.rowCount>0) {
-    return response;
-   }else{
-     return [];
-   }
+    if (medio!==undefined) {
+      console.log(tipo);
+      params=[medio,fechaInicio,fechaFin];
+      const response= await db.query(`SELECT * from noticia n
+      LEFT JOIN  medio m ON m.medio_id=n.medio_id  WHERE n.activo=true AND 
+      n.medio_id=$1 AND
+      n.fecha_creacion 
+       BETWEEN $2 AND $3
+      ORDER BY n.porcentaje ${tipo} LIMIT 3`,params); 
+     if (response.rowCount>0) {
+       console.log(response.rows)
+       return response;
+     }else{
+       return [];   
+     }
+  
+    }
+    // else{
+    //   params=[i,f];
+    //   const response= await db.query(`SELECT * from noticia n WHERE 
+    //    n.fecha_creacion  BETWEEN  $1 AND $2
+    //   ORDER BY n.fecha_creacion ASC `,params);
+    //  if (response.rowCount>0) {
+    //   return response;
+    //  }else{
+    //    return [];
+    //  }
+    // }
   }
+  
 }
 
 module.exports={
