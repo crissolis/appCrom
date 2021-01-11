@@ -24,12 +24,12 @@ const noticasCron=async ()=>{
   if (mediosL.length===0) {
     await med.findAllMe().then(async (resp) => {
       mediosL=resp;
-      console.log(mediosL)
+      console.log(mediosL);
     }); 
   }else{
 
     console.log("wwwwwwwwwwwwwwwwwwwwwwwwww",mediosL)
-  await mediosL.forEach((element) => {
+     await mediosL.forEach((element) => {
     const newLocal = element["medio_name"];
     let params = { screen_name:newLocal, count:10, tweet_mode: 'extended' };
     console.log(element["medio_name"]);
@@ -41,9 +41,9 @@ const noticasCron=async ()=>{
 
   Promise.all(promesas)
     .then(async (datos) => {
-      datos.forEach((element) => {
+      datos.forEach(async(element) => {
         dato.noticias.push(element.data);
-         med .GuardarNoN(element.data)
+         await med .GuardarNoN(element.data)
         .then((notcias) => {
           console.log("XXXXXXXXXXXXXXXXXXXXXXXXX");
           // not.push(notcias);
