@@ -210,7 +210,8 @@ const GuardarNoN= async (noticias) => {
    txt= tokenizer.tokenize(txf);
     porcentaje=analyzer.getSentiment(txt);
     //  console.log(porcentaje);
-    porcentaje=porcentaje.toFixed(4);
+    // porcentaje=porcentaje.toFixed(4);
+    porcentaje= Math.round(analysis * 100) / 100;
     porcentaje=Number(porcentaje);
 
     //  console.log(id,fechaCreacion,texto,url,media_url,porcentaje,medio_id);
@@ -370,3 +371,15 @@ module.exports={
 
     GuardarNoN
 }
+
+
+
+// if(analysis > -0.05 && analysis < 0.05) {
+//   console.log( "😐");
+// }else if(analysis > 0.07){
+//   console.log("😃")
+// }else if(analysis > 0){
+//   console.log("🙂")
+// }else if(analysis < 0){
+//   console.log("😕")
+// }
