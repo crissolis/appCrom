@@ -15,6 +15,6 @@ app.use(express.urlencoded({extended:false}));
    
 
                    
-app.listen('3000', () => {
+app.listen(process.env.PORT || '3000', () => {
   console.log('Escuchando puerto: ', process.env.PORT);
 });         

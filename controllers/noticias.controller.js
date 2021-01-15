@@ -73,6 +73,7 @@ const noticasCron=async ()=>{
 
 
 const getNoticias = async (req, res) => {
+  console.log("eeee")
   var dato = {
     noticias: [],
     estado: Boolean,
