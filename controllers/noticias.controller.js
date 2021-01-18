@@ -28,7 +28,7 @@ const noticasCron=async ()=>{
     }); 
   }else{
 
-    console.log("wwwwwwwwwwwwwwwwwwwwwwwwww",mediosL)
+    // console.log("wwwwwwwwwwwwwwwwwwwwwwwwww",mediosL)
      await mediosL.forEach((element) => {
     const newLocal = element["medio_name"];
     let params = { screen_name:newLocal, count:10, tweet_mode: 'extended' };
@@ -39,33 +39,25 @@ const noticasCron=async ()=>{
     );
   });
 
-  Promise.all(promesas)
-    .then(async (datos) => {
-      datos.forEach(async(element) => {
-        dato.noticias.push(element.data);
-         await med .GuardarNoN(element.data)
-        .then((notcias) => {
-          console.log("XXXXXXXXXXXXXXXXXXXXXXXXX");
-          // not.push(notcias);
-        })
+  await Promise.all(promesas)
+    .then( (datos) => {
+      datos.forEach((element) => {
+        // console.log(element.data)
+        element.data.forEach(ele=>{
+          dato.noticias.push(ele);
+        });
+        
       });
-
-      // dato.noticias.forEach(async(element) => {
-      //   console.log(element);
-      //    await med .GuardarNoN(element)
-      //     .then((notcias) => {
-      //       console.log("XXXXXXXXXXXXXXXXXXXXXXXXX");
-      //       // not.push(notcias);
-      //     })
-      //     .catch((err) => console.log(err));
-      // });
-    
- 
-
     })
     .catch((err) => {
       console.log(err)
     });
+
+for await (d of dato.noticias) {
+  console.log( await med.GuardarNot(d));
+   console.log(d);
+}
+
  }
     
 }
@@ -73,7 +65,7 @@ const noticasCron=async ()=>{
 
 
 const getNoticias = async (req, res) => {
-  console.log("eeee")
+  console.log("eeee");
   var dato = {
     noticias: [],
     estado: Boolean,
@@ -103,7 +95,9 @@ const getNoticias = async (req, res) => {
   });
 
   //?CONSULTA PARA NUEVOS  Y EL HOME
-  await med.findAllMe(medio).then(async (resp) => {
+  await med
+    .findAllMe(medio)
+    .then(async (resp) => {
       if (conslt == "true") {
         console.log("-----------------------------------cosnult");
         if (ultimoid === undefined) {
@@ -126,14 +120,14 @@ const getNoticias = async (req, res) => {
                 id = ele.id;
                 params = {
                   screen_name: newLocal,
-                  count: 10,// numero de noticias a retornar
+                  count: 10, // numero de noticias a retornar
                   tweet_mode: "extended",
                   since_id: Number(id),
                 };
               } else {
                 params = {
                   screen_name: newLocal,
-                  count: 10,// numero de noticias a retornar
+                  count: 10, // numero de noticias a retornar
                   tweet_mode: "extended",
                 };
               }
@@ -141,63 +135,53 @@ const getNoticias = async (req, res) => {
 
             //   let params = { screen_name:newLocal, count:1, tweet_mode: 'extended' };
             //  let params = { screen_name:newLocal, count:1, tweet_mode: 'extended',since_id:id};
-              //console.log(params)
+            //console.log(params)
             promesas.push(
               config.apliClient.get("statuses/user_timeline", params)
             );
           });
 
-          Promise.all(promesas)
-            .then(async (datos) => {
-               console.log(datos)
+          await Promise.all(promesas)
+            .then((datos) => {
               datos.forEach((element) => {
-                dato.noticias.push(element.data);
+                // console.log(element.data)
+                element.data.forEach((ele) => {
+                  dato.noticias.push(ele);
+                });
               });
-
-              if (dato.noticias[0].length > 0) {
-                //  console.log(dato.noticias);
-                  dato.noticias.forEach((element) => {
-                    console.log(element);
-                    med.GuardarNot(element) 
-                      .then((notcias) => {
-                        console.log("eyyyyyyyyyyy");
-                        // not.push(notcias);
-                      })
-                      .catch((err) => console.log(err));
-                  });
-                }
-                else{
-                    res.json({
-                      status:'200',
-                      mesagge:'No hay noticias nuevas' 
-                    });
-                }
-
-              res.json({
-               status:'200',
-             mesagge:'Consulta realizada correctamente' 
-              })
-              //    console.log(dato.noticias)
-
-           
-
-
-
             })
             .catch((err) => {
+              console.log(err);
               res.json({
-                  err
-                });
+                err,
+              });
             });
+
+          if (dato.noticias.length > 0) {
+            for await (d of dato.noticias) {
+              console.log(await med.GuardarNot(d));
+              console.log(d);
+            }
+          } else {
+            res.json({
+              status: "200",
+              mesagge: "No hay noticias nuevas",
+            });
+          }
+
+          res.json({
+            status: "200",
+            mesagge: "Consulta realizada correctamente",
+          });
         } else {
-            console.log("--------------------------------------------------else");
+          console.log("--------------------------------------------------else");
           await resp.forEach((element) => {
             var params = {};
             const newLocal = element["medio_name"];
             //   let params = { screen_name:newLocal, count:1, tweet_mode: 'extended' };
             params = {
               screen_name: newLocal,
-              count: 30,
+              count: 10,
               tweet_mode: "extended",
               max_id: ultimoid,
             };
@@ -207,41 +191,40 @@ const getNoticias = async (req, res) => {
             );
           });
 
-          Promise.all(promesas)
-            .then(async (datos) => {
-              //  console.log(datos)
+          await Promise.all(promesas)
+            .then((datos) => {
               datos.forEach((element) => {
-                dato.noticias.push(element.data);
-              });
-
-              //    console.log(dato.noticias)
-
-              if (dato.noticias[0].length > 0) {
-                console.log(dato.noticias);
-                dato.noticias.forEach((element) => {
-                  console.log(element);
-                  med
-                    .GuardarNot(element)
-                    .then((notcias) => {
-                      console.log("444444444444444444444444444");
-                      // not.push(notcias);
-                    })
-                    .catch((err) => console.log(err));
+                // console.log(element.data)
+                element.data.forEach((ele) => {
+                  dato.noticias.push(ele);
                 });
-              }
-              res.json({
-                status:'200',
-            mesagge:'Consulta realizada correctamente' 
-            })
-
+              });
             })
             .catch((err) => {
+              console.log(err);
               res.json({
                 err,
               });
             });
 
-          
+            if (dato.noticias.length > 0) {
+              for await (d of dato.noticias) {
+                console.log(await med.GuardarNot(d));
+                console.log(d);
+              }
+            } else {
+              res.json({
+                status: "200",
+                mesagge: "No hay noticias nuevas",
+              });
+            }
+  
+            res.json({
+              status: "200",
+              mesagge: "Consulta realizada correctamente",
+            });
+
+
         }
       } else {
         med

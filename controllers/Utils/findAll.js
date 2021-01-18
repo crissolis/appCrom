@@ -87,12 +87,14 @@ const findAllNot= async (medio,paguina) => {
 }
 const GuardarNot= async (noticias) => {
 
+  console.log("ENTRO AQUI")
+
   var tokenizer = new natural.AggressiveTokenizerEs;
   // AFINN
   var analyzer = new Analyzer("Spanish", stemmer, "senticon"); 
   // if (noticias!==undefined) {
 
-    var id= noticias[0].id;
+    var id= noticias.id;
     const regex = /https:/gi;
     const responseN = await db.query(`SELECT * FROM noticia WHERE 
     activo=true and id=${id}`);
@@ -103,28 +105,28 @@ const GuardarNot= async (noticias) => {
     // Guardo los datos
     var txt="" ;
     var porcentaje=0;    
-    var medio_id=noticias[0].user.id; 
-    var fechaCreacion=noticias[0].created_at;
-    var texto=noticias[0].full_text;
+    var medio_id=noticias.user.id; 
+    var fechaCreacion=noticias.created_at;
+    var texto=noticias.full_text;
      var url="";
 
-     if (noticias[0].entities.urls[0]!==undefined) {
+     if (noticias.entities.urls[0]!==undefined) {
 
-      if (noticias[0].entities.urls[0].url!==undefined) {
-        url=noticias[0].entities.urls[0].url
+      if (noticias.entities.urls[0].url!==undefined) {
+        url=noticias.entities.urls[0].url
          }else{
-           if (noticias[0].retweeted_status.entities.urls[0].url!==undefined) {
-              url=noticias[0].retweeted_status.entities.urls[0].url
+           if (noticias.retweeted_status.entities.urls[0].url!==undefined) {
+              url=noticias.retweeted_status.entities.urls[0].url
            }else{
-            url=noticias[0].extended_entities.media[0].url
+            url=noticias.extended_entities.media[0].url
            }
          }
      }
 
 
 
-    if (noticias[0].entities.media!==undefined) {
-    var media_url=noticias[0].entities.media[0].media_url || ""; 
+    if (noticias.entities.media!==undefined) {
+    var media_url=noticias.entities.media[0].media_url || ""; 
     
     }else{
       media_url="";
@@ -142,8 +144,13 @@ const GuardarNot= async (noticias) => {
     //  console.log(id,fechaCreacion,texto,url,media_url,porcentaje,medio_id);
     var params=[id,fechaCreacion,texto,url,media_url,porcentaje,medio_id,true];
 
-  return  db.query(`INSERT INTO noticia(id,fecha_creacion,contenido,noticia_url,media_url,porcentaje,medio_id,activo)
-     VALUES($1,$2,$3,$4,$5,$6,$7,$8)`,params);
+    try {
+      return await  db.query(`INSERT INTO noticia(id,fecha_creacion,contenido,noticia_url,media_url,porcentaje,medio_id,activo)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8)`,params); 
+    } catch (error) {
+      console.log(error)
+      return error;
+    }
     //  .then(res=>{
     //   not=not+res.rowCount;
     //   console.log(res.rowCount);
@@ -153,7 +160,6 @@ const GuardarNot= async (noticias) => {
     // }
 
   }
-return  not;
 }
 
 
@@ -211,7 +217,7 @@ const GuardarNoN= async (noticias) => {
     porcentaje=analyzer.getSentiment(txt);
     //  console.log(porcentaje);
     // porcentaje=porcentaje.toFixed(4);
-    porcentaje= Math.round(analysis * 100) / 100;
+    porcentaje= Math.round(porcentaje * 100) / 100;
     porcentaje=Number(porcentaje);
 
     //  console.log(id,fechaCreacion,texto,url,media_url,porcentaje,medio_id);
