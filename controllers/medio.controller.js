@@ -1,4 +1,4 @@
-const med = require('./Utils/findAll')
+const med = require('./Utils/Dbmedio')
 const config = require('../config/config');
 
 
@@ -14,29 +14,49 @@ const guardarMedio= async (req,res)=>{
     const imgUrl=req.query.imagen_url;
     const banner=req.query.banner_url;
 
-
+    const usuario=req.query.usuario;
  
-    var params=[id,medio_name,nombre,url,location,description,imgUrl,banner,true];
-    console.log(params);
+    var params=[id,medio_name,nombre,url,location,description,imgUrl,banner,true,false];
+    // console.log(params);
 
-    med.GuardarMed(params).then(resp=>{
+
+   let medios= await med.getMedioId(id);
+
+   if (medios.length>0) {
+    
+    let relacion=await med.getUsuarioMedio(id,usuario);
+    if (relacion.length>0) {
+        med.updateUsuarioMedio(id,usuario).then(resp=>{
+            res.json({
+                status:'200',
+                message:'medio Guardado',
+                resp
+            })
+           });
+
+    }else{
+       med.GuardarUsuaMedio(usuario,id).then(resp=>{
         res.json({
             status:'200',
             message:'medio Guardado',
             resp
         })
+       });
+    }
+   }else{
+    med.GuardarMed(params).then(resp=>{
+        med.GuardarUsuaMedio(usuario,id).then(respu=>{
+            res.json({
+                status:'200',
+                message:'medio Guardado',
+                resp,
+            })
+           });  
+        
     }).catch(err=>{console.log(err)
         res.json(err)});
-    // db.query(`INSERT INTO medio(medio_id,medio_name,nombre,url,location,description,activo)
-    //  VALUES($1,$2,$3,$4,$5,$6,$7,$8)`,params).then(resp=>{
-    //     res.json(resp);
-    //  });
-   
-   
-
-// console.log(req.query);
-
-
+   }
+    
 
 }
 
@@ -84,7 +104,9 @@ config.apliClient.get('users/search', params).then(data=>{
 }
 
 const getMedios= async (req,res)=>{
-    med.findAllMedio().then(resp=>{
+    const usuario=req.query.usuario;
+   
+    med.findAllMe(undefined,usuario).then(resp=>{
         res.json({
             status:'200',
             message:'Se recuperaron todos los medio',
@@ -97,6 +119,38 @@ const getMedios= async (req,res)=>{
             err
         });
     });
+}
+
+
+const Eliminiarmedio= async (req,res)=>{
+    const medio=req.query.medio;
+    const usuario=req.query.usuario;
+    var medioR;
+    medioR=await med.findAllMe(medio,usuario);
+
+    //  console.log(medioR)
+    if (medioR!==undefined) {
+    med.DeleteMed(medio,usuario).then(resp=>{
+        res.json({
+            status:'200',
+            message:"Medio Eliminado",
+            resp
+        })
+    }).catch(err=>{
+        res.json({
+            status:'400',
+            message:'Error al eliminar el medio',
+            err
+        });
+    });
+     
+    }else{
+        res.json({
+            status:'400',
+            message:'El medio no existe',
+            
+        });
+    }
 }
 
 // modelo de medios
@@ -129,5 +183,6 @@ function Medio(
 module.exports={
     buscarMedio,
     guardarMedio,
-    getMedios
+    getMedios,
+    Eliminiarmedio
 };
