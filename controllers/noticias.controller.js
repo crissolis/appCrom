@@ -16,6 +16,8 @@ const config = require("../config/config");
 
 const noticasCron=async ()=>{
   const promesas = [];
+  const primerid = [];
+  let params={};
   var dato = {
     noticias: [],
     estado: Boolean,
@@ -25,15 +27,40 @@ const noticasCron=async ()=>{
   if (mediosL.length===0) {
     await MedioDB.findAllMedioDefect().then(async (resp) => {
       mediosL=resp;
-      console.log(mediosL);
+      // console.log(mediosL);
     }); 
   }else{
 
-    // console.log("wwwwwwwwwwwwwwwwwwwwwwwwww",mediosL)
+    
+     await mediosL.forEach(async (element) => {
+        let r=await MedioDB.findUltimoId(element["medio_id"]);
+        if (r.length>0) {
+          primerid.push(r);
+        } 
+      });
+  
+
+
+     console.log(primerid)
      await mediosL.forEach((element) => {
-    const newLocal = element["medio_name"];
-    let params = { screen_name:newLocal, count:10, tweet_mode: 'extended' };
-    console.log(element["medio_name"]);
+     
+      if (primerid.length!==0) {
+        primerid.forEach((ele) => {
+          if (ele.medio_id === element["medio_id"]) {
+            id = ele.id;
+            params = {
+              screen_name: newLocal,
+              count: 20, // numero de noticias a retornar
+              tweet_mode: "extended",
+              since_id: Number(id),
+            };
+          } 
+        });
+      }else{
+        const newLocal = element["medio_name"];
+         params = { screen_name:newLocal, count:10, tweet_mode: 'extended' };
+        console.log(element["medio_name"]);
+      }
 
     promesas.push(
       config.apliClient.get("statuses/user_timeline", params)
@@ -229,10 +256,12 @@ const getNoticias = async (req, res) => {
 
 
         }
-      } else {
-        med
+      } else { 
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        med 
           .findAllNot(medio, pag,usuario)
           .then((not) => {
+        // console.log(not)
             res.json({ status: "200", noticias: not });
           })
           .catch((err) => res.json(err));

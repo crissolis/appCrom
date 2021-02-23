@@ -1,7 +1,7 @@
 var CronJob = require('cron').CronJob;
 const notic=require('../controllers/noticias.controller');
 const buscar=()=>{
-var job = new CronJob('*/60 * * * * *', function() {
+var job = new CronJob('*/01 * * * *', function() {
   notic.noticasCron().then(()=>{
     console.log('<_________________________________________________________________________________________>');
   });

@@ -9,13 +9,17 @@ const findAllNot= async (medio,pagina,usuario) => {
     if (medio===undefined) {
       try {
         var params=[pagina,usuario]
-        const response = await db.query(`SELECT * FROM noticia n LEFT  JOIN usuario_medio u
-        JOIN medio m ON m.medio_id = u.medio_id 
-        ON n.medio_id = u.medio_id WHERE u.usuario_id=$2 and m.activo=true and u.activo=true
+        const response = await db.query(`SELECT * FROM noticia n 
+        JOIN usuario_medio u
+        ON n.medio_id = u.medio_id 
+        JOIN medio m ON
+        m.medio_id=u.medio_id
+        WHERE u.usuario_id=$2 and m.activo=true and u.activo=true
          ORDER BY  n.fecha_creacion DESC limit $1`,params);
+        //  console.log(response)
         if (response.rowCount > 0) {
           return response.rows;
-        }
+        }  
       } catch (error) {
         return error;
       } 
@@ -23,10 +27,13 @@ const findAllNot= async (medio,pagina,usuario) => {
     } else {
       try {
        var params=[medio,pagina,usuario]
-       console.log(params)
-        const response = await db.query(`SELECT * FROM noticia n LEFT JOIN usuario_medio u
-        JOIN medio m ON m.medio_id = u.medio_id 
-        ON n.medio_id = u.medio_id WHERE u.usuario_id=$3 AND n.medio_id=$1
+      //  console.log(params)
+        const response = await db.query(`SELECT * FROM noticia n
+        JOIN usuario_medio u
+        ON n.medio_id = u.medio_id 
+        JOIN medio m ON
+        m.medio_id=u.medio_id
+         WHERE u.usuario_id=$3 AND n.medio_id=$1
          ORDER BY n.fecha_creacion DESC limit $2`,params);
         //  console.log(response)
         if (response.rowCount > 0) {
@@ -62,7 +69,7 @@ const findAllNot= async (medio,pagina,usuario) => {
       var texto=noticias.full_text;
        var url="";
         
-       console.log(texto)
+      //  console.log(texto)
        if (noticias.entities.urls[0]!==undefined) {
   
         if (noticias.entities.urls[0].url!==undefined) {
@@ -100,7 +107,7 @@ const findAllNot= async (medio,pagina,usuario) => {
       try {
          resp= await  db.query(`INSERT INTO noticia(id,fecha_creacion,contenido,noticia_url,media_url,porcentaje,medio_id,activo)
         VALUES($1,$2,$3,$4,$5,$6,$7,$8)`,params); 
-        console.log(resp)
+        // console.log(resp)
         if (resp.rowCount>0) {
           return resp.rowCount;
         }else{
