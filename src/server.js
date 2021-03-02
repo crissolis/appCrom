@@ -1,9 +1,9 @@
 const express =  require('express')
 const app = express()
 const bodyParser = require('body-parser'); 
-const cron =require('../jobs/buscarNoticias');
+// const cron =require('../jobs/buscarNoticias');
 
-cron.buscar();
+// cron.buscar();
 //   Middlewares
 // app.use(express.json());   
 // app.use(bodyParser.urlencoded({extended:true}));

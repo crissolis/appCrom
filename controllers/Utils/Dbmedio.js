@@ -181,9 +181,9 @@ const findAllMedioDefect= async () => {
 // YA ESTA SUS FUNCIONES GuardarUsuaMedio 
 const GuardarUsuaMedio= async (usuario,medio) => {
   var res;
-  params=[usuario,medio,true]
-  console.log(params)
-    db.query(`SELECT * FROM GuardarUsuaMedio($1,$2)`,params).then(resp=>{
+  params=[usuario,medio]
+  console.log(params) 
+    await db.query(`SELECT * FROM GuardarUsuaMedio($1,$2)`,params).then(resp=>{
        res=resp.rows;
     }).catch(err=>{
       res= err
