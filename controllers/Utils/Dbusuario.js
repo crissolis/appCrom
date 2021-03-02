@@ -45,12 +45,12 @@ const findUser= async (usuario,clave) => {
       const response = await db.query(` SELECT *FROM saveUser($1,$2,$3,$4,$5,$6)`,params);
       if (response.rowCount > 0) 
       {
-      const medios= await MedioDB.findAllMedioDefect();
-        if (medios.length>0) {
-        await medios.forEach(m => {
-          MedioDB.GuardarUsuaMedio(response.rows[0].usuario_id,m.medio_id);
-        });
-        }
+      // const medios= await MedioDB.findAllMedioDefect();
+      //   if (medios.length>0) {
+      //   await medios.forEach(m => {
+      //     MedioDB.GuardarUsuaMedio(response.rows[0].usuario_id,m.medio_id);
+      //   });
+      //   }
           // console.log(response)
         return response.rowCount;
       }else{

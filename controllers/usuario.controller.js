@@ -3,6 +3,7 @@ const MedioDB = require("./Utils/Dbmedio");
 const bcrypt = require("bcrypt");
 
 const getLogin = async (req, res) => {
+  
   const usuario = req.body.usuario;
   const clave = req.body.clave;
 let respuesta=[];
@@ -32,7 +33,8 @@ let respuesta=[];
           } else {
 
               // * AGREGAR LA RELACION CON LOS MEDIOS
-         let respmex=await MedioDB.findAllMedio(user[0].usuario_id);
+         let respmex=await MedioDB.findAllMe(undefined,user[0].usuario_id);
+         console.log(respmex)
          if (respmex.length===0) {
            respm= await MedioDB.findAllMedioDefect();
        if (respm.length>0) {
