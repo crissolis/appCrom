@@ -153,6 +153,46 @@ const Eliminiarmedio= async (req,res)=>{
     }
 }
 
+
+const updateMedios= async (req,res)=>{
+    const usuario=req.query.usuario; 
+    const medios=await med.findAllMe(undefined,usuario);
+    let promesas=[];
+    let datosM=[];
+    // console.log(medios);
+
+    medios.forEach(m=>{
+      let params = { q:m.nombre,count:1};
+       promesas.push(config.apliClient.get('users/search', params));
+    });
+   
+    
+    await Promise.all(promesas)
+        .then( (datos) => {
+            datos.forEach((element) => {
+            // console.log(element.data)
+            element.data.forEach(ele=>{
+                datosM.push(ele);
+            });
+            
+            });
+        });
+
+        if (datosM.length > 0) {
+            for await (d of datosM) {
+              console.log(await med.ActualizarMedios(d));
+            //   console.log(d);
+            }
+        }
+
+        res.json({
+            status: "200",
+            mesagge: "SE actualizaron los medios",
+          });
+
+}
+
+
 // modelo de medios
 function Medio(
     medio_id,
@@ -184,5 +224,6 @@ module.exports={
     buscarMedio,
     guardarMedio,
     getMedios,
-    Eliminiarmedio
+    Eliminiarmedio,
+    updateMedios
 };

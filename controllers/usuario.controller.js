@@ -106,7 +106,7 @@ console.log(usuario)
     user[0].password="";
     res.json({
       status: "400",
-      message: "no se pudo guardar datos ya existentes",
+      message: "no se pudo guardar datos ya existentes correo/nick",
       user,
     });
   }

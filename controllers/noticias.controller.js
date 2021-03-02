@@ -4,15 +4,6 @@ const config = require("../config/config");
  mediosL=[];
 // ?para natural
 
-// var natural = require('natural');
-// var Analyzer = require('natural').SentimentAnalyzer;
-// var stemmer = require('natural').PorterStemmerEs;
-
-// var dato={
-//     noticias:[],
-//     estado:Boolean,
-//     sentimiento:Number
-// }
 
 const noticasCron=async ()=>{
   const promesas = [];
@@ -119,18 +110,22 @@ const getNoticias = async (req, res) => {
   //?ULTIMOS IDES GENERADOS
 
   await MedioDB.findAllMedio(medio,usuario).then((resp) => {
-    resp.forEach(async (element) => {
-      let r=await MedioDB.findUltimoId(element["medio_id"]);
-      if (r.length>0) {
-        primerid.push(r);
-      } 
-    });
+    if (res.length>0) {
+      resp.forEach(async (element) => {
+        let r=await MedioDB.findUltimoId(element["medio_id"]);
+        if (r) {
+          primerid.push(r);
+        } 
+      });
+    }  
   });
 
+  
   //?CONSULTA PARA NUEVOS  Y EL HOME
   await MedioDB
     .findAllMedio(medio,usuario)
     .then(async (resp) => {
+      //  console.length(resp)
       if (conslt == "true" && resp.length>0) {
         console.log("-----------------------------------cosnult");
         if (ultimoid === undefined) {
@@ -139,15 +134,15 @@ const getNoticias = async (req, res) => {
           await resp.forEach((element) => {
             var params = {};
             const newLocal = element["medio_name"];
-            console.log(element["medio_name"]);
-
+            // console.log(element["medio_name"]);
+            // console.log(ultimoid)
             if (primerid.length!==0) {
               primerid.forEach((ele) => {
                 if (ele.medio_id === element["medio_id"]) {
                   id = ele.id;
                   params = {
                     screen_name: newLocal,
-                    count: 20, // numero de noticias a retornar
+                    count: 10, // numero de noticias a retornar
                     tweet_mode: "extended",
                     since_id: Number(id),
                   };
@@ -164,7 +159,7 @@ const getNoticias = async (req, res) => {
 
             //   let params = { screen_name:newLocal, count:1, tweet_mode: 'extended' };
             //  let params = { screen_name:newLocal, count:1, tweet_mode: 'extended',since_id:id};
-            console.log(params)
+            // console.log("parametros"+params)
             promesas.push(
               config.apliClient.get("statuses/user_timeline", params)
             );
@@ -188,7 +183,7 @@ const getNoticias = async (req, res) => {
 
           if (dato.noticias.length > 0) {
             for await (d of dato.noticias) {
-              console.log(await med.GuardarNot(d));
+              console.log("linw"+await med.GuardarNot(d));
               // console.log(d);
             }
           } else {
@@ -200,7 +195,7 @@ const getNoticias = async (req, res) => {
 
           res.json({
             status: "200",
-            mesagge: "Consulta realizada correctamente",
+            mesagge: "Consulta realizada correctamente x",
           });
         } else {
           console.log(" ey--------------------------------------------------else");
@@ -211,7 +206,7 @@ const getNoticias = async (req, res) => {
             //   let params = { screen_name:newLocal, count:1, tweet_mode: 'extended' };
             params = {
               screen_name: newLocal,
-              count: 10,
+              count: 5,
               tweet_mode: "extended",
               max_id: ultimoid,
             };
@@ -303,7 +298,7 @@ const getReporte= async (req,res)=>{
     console.log('el eslse  perrp',tipo);
 
     med.findNoticiasFecha(fechaInicio,fechaFin,medio,tipo).then(resp=>{
-      if (resp.rows.length>0) {
+      if (resp.rowCount>0) {
         res.json({
           mesagge:'consulta correcta',
           status:'200',
@@ -323,6 +318,43 @@ const getReporte= async (req,res)=>{
 }
 
 
+const getNoticiaFav= async (req,res)=>{
+  let usuario=req.query.usuario;
+  console.log(usuario)
+  med.getFavoritos(usuario).then(resp=>{
+    res.json({
+      status:'200',
+      mesagge:'noticias recuperados correctamente',
+      noticias:resp
+    });
+  });
+}
+
+const deleteNoticiaFav= async (req,res)=>{
+  let usuario=req.query.usuario;
+  let noticia=req.query.noticia;
+  console.log(usuario,noticia)
+  med.borrarFavorito(noticia,usuario).then(resp=>{
+    res.json({
+      status:'200',
+      mesagge:'noticia eliminada de favoritos',
+      noticias:resp
+    });
+  });
+}
+
+const saveNoticiaFav= async (req,res)=>{
+  let usuario=req.query.usuario;
+  let noticia=req.query.noticia;
+  med.saveFavorito(noticia,usuario).then(resp=>{
+    res.json({
+      status:'200',
+      mesagge:'noticia agregada a favoritos',
+      noticias:resp
+    });
+  });
+}
+
 
 const getPrueba= async (req,res)=>{
   med.retornarFucion().then(r=>{
@@ -330,9 +362,15 @@ const getPrueba= async (req,res)=>{
   })
 }
 
+
+
+
 module.exports = {
   getNoticias,
   getReporte,
   noticasCron,
-  getPrueba
+  getPrueba,
+  getNoticiaFav,
+  deleteNoticiaFav,
+  saveNoticiaFav
 };
