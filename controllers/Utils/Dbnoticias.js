@@ -43,7 +43,7 @@ const findAllNot = async (medio, pagina, usuario) => {
       //    ORDER BY n.fecha_creacion DESC limit $2`,
       //   params
       // );
-      const response = await db.query(`SELECT *FROM findallnot($1,$2,$3)`,params);
+      const response = await db.query(`SELECT *FROM findallnot1($1,$2,$3)`,params);
       //  console.log(response)
       if (response.rowCount > 0) {
         return response.rows;

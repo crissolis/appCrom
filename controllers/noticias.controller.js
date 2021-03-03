@@ -109,7 +109,7 @@ const getNoticias = async (req, res) => {
 
   //?ULTIMOS IDES GENERADOS
 
-  await MedioDB.findAllMedio(medio,usuario).then((resp) => {
+  await MedioDB.findAllMe(medio,usuario).then((resp) => {
     if (res.length>0) {
       resp.forEach(async (element) => {
         let r=await MedioDB.findUltimoId(element["medio_id"]);
@@ -123,7 +123,7 @@ const getNoticias = async (req, res) => {
   
   //?CONSULTA PARA NUEVOS  Y EL HOME
   await MedioDB
-    .findAllMedio(medio,usuario)
+    .findAllMe(medio,usuario)
     .then(async (resp) => {
       //  console.length(resp)
       if (conslt == "true" && resp.length>0) {
@@ -298,6 +298,7 @@ const getReporte= async (req,res)=>{
     console.log('el eslse  perrp',tipo);
 
     med.findNoticiasFecha(fechaInicio,fechaFin,medio,tipo).then(resp=>{
+      console.log(fechaInicio,fechaFin)
       if (resp.rowCount>0) {
         res.json({
           mesagge:'consulta correcta',
