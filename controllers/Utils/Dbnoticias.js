@@ -235,6 +235,7 @@ const findNoticiasFecha = async (fechaInicio, fechaFin, medio, tipo) => {
 
   let i = new Date(fechaInicio);
   let f = new Date(fechaFin);
+  console.log(i,f);
   console.log(medio);
   if (tipo === undefined) {
     if (medio !== undefined) {
