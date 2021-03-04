@@ -76,6 +76,7 @@ const GuardarNot = async (noticias) => {
     var porcentaje = 0;
     var medio_id = noticias.user.id;
     var fechaCreacion = noticias.created_at;
+    fechaCreacion=new Date(fechaCreacion);
     var texto = noticias.full_text;
     var url = "";
 
