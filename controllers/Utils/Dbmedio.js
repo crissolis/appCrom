@@ -86,7 +86,7 @@ const findAllMedio= async (medio,usuario) => {
       const response = await db.query(`SELECT * FROM medio  m 
       LEFT  JOIN usuario_medio u
      ON m.medio_id = u.medio_id
-     WHERE u.usuario_id=$1 and m.activo=true and u.activo=true `,params);
+     WHERE  m.activo=true and u.activo=true `);
     //  console.log(response);
       if (response.rowCount > 0) {
         return response.rows;

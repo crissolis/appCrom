@@ -247,8 +247,9 @@ const findNoticiasFecha = async (fechaInicio, fechaFin, medio, tipo) => {
       //   n.medio_id=$1 AND
       //   n.fecha_creacion  BETWEEN $2 AND $3
       //   ORDER BY n.fecha_creacion ASC `,
-      //   params
+      //   params 
       // );
+      console.log("aqu deberia")
       const response = await db.query(`SELECT * FROM  findNoticiasFecha($1,$2,$3)`,params);
       if (response.rowCount > 0) {
         console.log(response.rows);
@@ -257,6 +258,7 @@ const findNoticiasFecha = async (fechaInicio, fechaFin, medio, tipo) => {
         return [];
       }
     } else {
+      console.log("aqu no deberia")
       params = [i, f];
       // const response = await db.query(
       //   `SELECT * from noticia n 

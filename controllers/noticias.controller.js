@@ -16,7 +16,7 @@ const noticasCron=async ()=>{
   };
 
   if (mediosL.length===0) {
-    await MedioDB.findAllMedioDefect().then(async (resp) => {
+    await MedioDB.findAllMedio(undefined,undefined).then(async (resp) => {
       mediosL=resp;
       // console.log(mediosL);
     }); 
@@ -277,7 +277,7 @@ const getReporte= async (req,res)=>{
 
   console.log(fechaInicio,fechaFin)
   console.log(tipo)
-  if (tipo===undefined) {
+  if (tipo==='undefined') {
     med.findNoticiasFecha(fechaInicio,fechaFin,medio).then(resp=>{
       if (resp.rows.length>0) {
         res.json({
