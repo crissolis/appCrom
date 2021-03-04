@@ -70,6 +70,7 @@ const GuardarNot = async (noticias) => {
     // console.log(responseN)
   // console.log(responseN.rowCount)
   if (responseN.rowCount == 0) {
+    console.log("ENTRA AL IF")
     var not = 0;
     // Guardo los datos
     var txt = "";
@@ -80,7 +81,7 @@ const GuardarNot = async (noticias) => {
     var texto = noticias.full_text;
     var url = "";
 
-    //  console.log(texto)
+     console.log(texto)
     if (noticias.entities.urls[0] !== undefined) {
       if (noticias.entities.urls[0].url !== undefined) {
         url = noticias.entities.urls[0].url;
@@ -122,6 +123,8 @@ const GuardarNot = async (noticias) => {
     
       console.log(params)
     try {
+
+      // console.log("entra al try")
       // resp = await db.query(
       //   `INSERT INTO noticia(id,fecha_creacion,contenido,noticia_url,media_url,porcentaje,medio_id,activo)
       //   VALUES($1,$2,$3,$4,$5,$6,$7,$8)`,
@@ -130,13 +133,14 @@ const GuardarNot = async (noticias) => {
       // );
       const resp = await db.query(`SELECT * FROM GuardarNot($1,$2,$3,$4,$5,$6,$7,$8)`,params);
        console.log("eeeeeeeeeeee"+resp); 
-      if (resp.rowCount > 0) {
+      if (resp.rowCount > 0) {     
         return resp.rowCount;
       } else {
+      //  console.log("no retorna nada"); 
         return [];
       }
     } catch (error) {
-      console.log("ssssssssssssssssss"+error);
+      // console.log("ssssssssssssssssss"+error);
       return error;
     }
     //  .then(res=>{

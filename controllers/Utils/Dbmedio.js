@@ -213,7 +213,7 @@ const GuardarUsuaMedio= async (usuario,medio) => {
     console.log(params)
     // const response= await db.query(`SELECT * FROM usuario_medio m 
     // WHERE   m.medio_id=$1 and m.usuario_id=$2`,params); 
-    const response = await db.query(`SELECT * FROM getUsuarioMedio($1,$2)`);
+    const response = await db.query(`SELECT * FROM getUsuarioMedio($1,$2)`,params);
     if (response.rowCount>0) {
      return response.rows;
     }else{
