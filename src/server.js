@@ -1,9 +1,9 @@
 const express =  require('express')
 const app = express()
 const bodyParser = require('body-parser'); 
-// const cron =require('../jobs/buscarNoticias');
+const cron =require('../jobs/buscarNoticias');
 
-// cron.buscar();
+cron.buscar();
 //   Middlewares
 // app.use(express.json());   
 // app.use(bodyParser.urlencoded({extended:true}));
@@ -13,8 +13,8 @@ app.use(require('../Middlewares/cors'));
 
 // Body Parser
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 
                  
